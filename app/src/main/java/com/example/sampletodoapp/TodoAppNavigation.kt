@@ -22,7 +22,7 @@ fun TodoAppNavigation(
             HomeScreen()
         }
         composable(Route.AddTask) {
-            AddTaskScreen()
+            AddTaskScreen(navController = navController)
         }
     }
 }
