@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,66 +36,85 @@ import java.util.Locale
 
 @Composable
 fun AddTaskScreen(
+    viewModel: AddTaskViewModel,
     navController: NavController
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-        var showDatePicker by remember { mutableStateOf(false) }
-        var taskName by remember { mutableStateOf("") }
-        var deadline by remember { mutableStateOf("") }
-        // タスク名の入力
-        OutlinedTextField(
-            value = taskName,
-            onValueChange = { taskName = it },
-            label = { Text("タスクを入力") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            singleLine = true
-        )
-        // 期限の選択
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "期限日: ${deadline}", fontSize = 20.sp)
-            OutlinedButton(
-                onClick = { showDatePicker = true }
+    val uiState = viewModel.uiState.collectAsState()
+    when (val state = uiState.value) {
+        is AddTaskUiState.Input -> {
+            // タスク作成中のUIを表示
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(
-                    text = "期日の選択",
+                var showDatePicker by remember { mutableStateOf(false) }
+                // タスク名の入力
+                OutlinedTextField(
+                    value = state.title,
+                    onValueChange = { viewModel.updateTitle(newTitle = it) },
+                    label = { Text("タスクを入力") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    singleLine = true
                 )
+                // 期限の選択
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "期限日: ${state.deadline}", fontSize = 20.sp)
+                    OutlinedButton(
+                        onClick = { showDatePicker = true }
+                    ) {
+                        Text(
+                            text = "期日の選択",
+                        )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(text = "重要度")
+                    ImportanceRadioButtons(
+                        selected = state.importance,
+                        onSelected = { viewModel.updateImportance(newImportance = it) }
+                    )
+                }
+                Button(
+                    onClick = {
+                        navController.navigate("home")
+                    }
+                ) {
+                    Text(text = "追加")
+                }
+                if (showDatePicker) {
+                    DatePickerModal(
+                        onDateSelected = { date ->
+                            showDatePicker = false
+                            viewModel.updateDeadline(
+                                newDeadline = date?.let { convertMillisToDate(it) } ?: ""
+                            )
+                        },
+                        onDismiss = { showDatePicker = false }
+                    )
+                }
             }
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(text = "重要度")
-            ImportanceRadioButtons()
+
+        is AddTaskUiState.Saving -> {
+            // 保存中のUIを表示
+            CircularProgressIndicator()
         }
-        Button(
-            onClick = {
-                navController.navigate("home")
-            }
-        ) {
-            Text(text = "追加")
-        }
-        if (showDatePicker) {
-            DatePickerModal(
-                onDateSelected = { date ->
-                    showDatePicker = false
-                    deadline = date?.let { convertMillisToDate(it) } ?: ""
-                },
-                onDismiss = { showDatePicker = false }
-            )
+
+        is AddTaskUiState.Success -> {
+            // タスク保存成功時のUIを表示
         }
     }
 }
@@ -127,18 +148,20 @@ fun DatePickerModal(
 }
 
 @Composable
-fun ImportanceRadioButtons() {
+fun ImportanceRadioButtons(
+    selected: String,
+    onSelected: (String) -> Unit
+) {
     val options = listOf("高", "中", "低")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[1]) }
     Row(modifier = Modifier.selectableGroup()) {
         options.forEach { text ->
             Row(
                 modifier = Modifier
                     .selectable(
                         selected = (
-                                text == selectedOption
+                                text == selected
                                 ),
-                        onClick = { onOptionSelected(text) },
+                        onClick = { onSelected(text) },
                         role = Role.RadioButton,
                     )
                     .padding(16.dp),
@@ -146,7 +169,7 @@ fun ImportanceRadioButtons() {
             ) {
                 RadioButton(
                     selected = (
-                            text == selectedOption
+                            text == selected
                             ),
                     onClick = null
                 )

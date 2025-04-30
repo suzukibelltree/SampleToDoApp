@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.sampletodoapp.compose.addtask.AddTaskScreen
+import com.example.sampletodoapp.compose.addtask.AddTaskViewModel
 import com.example.sampletodoapp.compose.home.HomeScreen
 
 @Composable
@@ -22,7 +23,8 @@ fun TodoAppNavigation(
             HomeScreen()
         }
         composable(Route.AddTask) {
-            AddTaskScreen(navController = navController)
+            val viewModel = AddTaskViewModel()
+            AddTaskScreen(viewModel = viewModel, navController = navController)
         }
     }
 }
