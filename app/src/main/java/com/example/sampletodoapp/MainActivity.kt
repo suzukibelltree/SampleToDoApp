@@ -18,10 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SampleToDoAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                }
-            }
+            SampleTodoApp()
         }
     }
 }
