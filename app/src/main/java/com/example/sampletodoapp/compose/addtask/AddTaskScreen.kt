@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
@@ -40,7 +41,7 @@ import java.util.Locale
 
 @Composable
 fun AddTaskScreen(
-    viewModel: AddTaskViewModel,
+    viewModel: AddTaskViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val uiState = viewModel.uiState.collectAsState()

@@ -23,13 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.sampletodoapp.Route
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val state = viewModel.uiState.collectAsState()
@@ -67,7 +69,7 @@ fun HomeScreen(
                             TaskCard(
                                 task = task,
                                 onClick = {
-
+                                    navController.navigate("${Route.EditTask}/${task.id}")
                                 },
                                 onDelete = {
                                     viewModel.deleteTask(task)
@@ -92,7 +94,9 @@ fun TaskCard(
     onComplete: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier

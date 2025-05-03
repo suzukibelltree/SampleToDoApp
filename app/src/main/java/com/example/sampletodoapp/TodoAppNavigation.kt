@@ -2,14 +2,13 @@ package com.example.sampletodoapp
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.sampletodoapp.compose.addtask.AddTaskScreen
-import com.example.sampletodoapp.compose.addtask.AddTaskViewModel
+import com.example.sampletodoapp.compose.edittask.EditTaskScreen
 import com.example.sampletodoapp.compose.home.HomeScreen
-import com.example.sampletodoapp.compose.home.HomeViewModel
 
 @Composable
 fun TodoAppNavigation(
@@ -22,12 +21,20 @@ fun TodoAppNavigation(
         modifier = modifier
     ) {
         composable(Route.Home) {
-            val viewModel: HomeViewModel = hiltViewModel()
-            HomeScreen(viewModel = viewModel, navController = navController)
+            HomeScreen(navController = navController)
         }
         composable(Route.AddTask) {
-            val viewModel: AddTaskViewModel = hiltViewModel()
-            AddTaskScreen(viewModel = viewModel, navController = navController)
+            AddTaskScreen(navController = navController)
+        }
+        composable(
+            route = "${Route.EditTask}/{taskId}",
+            arguments = listOf(
+                navArgument("taskId") {
+                    type = androidx.navigation.NavType.IntType
+                }
+            )
+        ) {
+            EditTaskScreen(navController = navController)
         }
     }
 }
