@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.googleDevToolsKsp)
+    id("com.google.dagger.hilt.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -38,6 +41,9 @@ android {
         compose = true
     }
 }
+kapt {
+    correctErrorTypes = true
+}
 
 dependencies {
 
@@ -54,6 +60,17 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.appcompat)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

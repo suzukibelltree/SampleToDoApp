@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.sampletodoapp.room.Task
+import com.example.sampletodoapp.room.TaskPriority
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -43,6 +47,7 @@ fun AddTaskScreen(
     when (val state = uiState.value) {
         is AddTaskUiState.Input -> {
             // タスク作成中のUIを表示
+            val scope = rememberCoroutineScope()
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,11 +89,19 @@ fun AddTaskScreen(
                     Text(text = "重要度")
                     ImportanceRadioButtons(
                         selected = state.importance,
-                        onSelected = { viewModel.updateImportance(newImportance = it) }
+                        onSelected = { viewModel.updateImportance(newImportance = it.level) }
                     )
                 }
                 Button(
                     onClick = {
+                        val task = Task(
+                            title = state.title,
+                            deadline = state.deadline,
+                            importance = state.importance.level
+                        )
+                        scope.launch {
+                            viewModel.saveTask(task) // タスクを保存
+                        }
                         navController.navigate("home")
                     }
                 ) {
@@ -149,19 +162,19 @@ fun DatePickerModal(
 
 @Composable
 fun ImportanceRadioButtons(
-    selected: String,
-    onSelected: (String) -> Unit
+    selected: TaskPriority,
+    onSelected: (TaskPriority) -> Unit
 ) {
-    val options = listOf("高", "中", "低")
+    val options = TaskPriority.entries.toTypedArray()
     Row(modifier = Modifier.selectableGroup()) {
-        options.forEach { text ->
+        options.forEach { priority ->
             Row(
                 modifier = Modifier
                     .selectable(
                         selected = (
-                                text == selected
+                                priority == selected
                                 ),
-                        onClick = { onSelected(text) },
+                        onClick = { onSelected(priority) },
                         role = Role.RadioButton,
                     )
                     .padding(16.dp),
@@ -169,12 +182,12 @@ fun ImportanceRadioButtons(
             ) {
                 RadioButton(
                     selected = (
-                            text == selected
+                            priority == selected
                             ),
                     onClick = null
                 )
                 Text(
-                    text = text,
+                    text = priority.label,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
