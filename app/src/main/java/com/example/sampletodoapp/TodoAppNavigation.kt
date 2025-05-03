@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.sampletodoapp.compose.addtask.AddTaskScreen
 import com.example.sampletodoapp.compose.addtask.AddTaskViewModel
 import com.example.sampletodoapp.compose.home.HomeScreen
+import com.example.sampletodoapp.compose.home.HomeViewModel
 
 @Composable
 fun TodoAppNavigation(
@@ -21,7 +22,8 @@ fun TodoAppNavigation(
         modifier = modifier
     ) {
         composable(Route.Home) {
-            HomeScreen()
+            val viewModel: HomeViewModel = hiltViewModel()
+            HomeScreen(viewModel = viewModel, navController = navController)
         }
         composable(Route.AddTask) {
             val viewModel: AddTaskViewModel = hiltViewModel()
