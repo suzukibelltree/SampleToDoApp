@@ -58,14 +58,42 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                 ) {
+                    Text(
+                        text = "未完了のタスク",
+                    )
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(uiState.tasks.size) {
-                            val task = uiState.tasks[it]
+                        items(uiState.unfinishedTasks.size) {
+                            val task = uiState.unfinishedTasks[it]
+                            TaskCard(
+                                task = task,
+                                onClick = {
+                                    navController.navigate("${Route.EditTask}/${task.id}")
+                                },
+                                onDelete = {
+                                    viewModel.deleteTask(task)
+                                },
+                                onComplete = {
+                                    viewModel.switchTask(task)
+                                }
+                            )
+                        }
+                    }
+                    Text(
+                        text = "完了したタスク",
+                    )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.finishedTasks.size) {
+                            val task = uiState.finishedTasks[it]
                             TaskCard(
                                 task = task,
                                 onClick = {

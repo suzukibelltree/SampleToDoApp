@@ -20,6 +20,14 @@ class TaskRepositoryImpl @Inject constructor(private val taskDao: TaskDao) : Tas
         return taskDao.getAllTasksFLow()
     }
 
+    override fun getUnfinishedTasks(): Flow<List<Task>> {
+        return taskDao.getUnfinishedTasks()
+    }
+
+    override fun getFinishedTasks(): Flow<List<Task>> {
+        return taskDao.getFinishedTasks()
+    }
+
     override fun loadTaskById(taskId: Int): Flow<Task> {
         return taskDao.loadTaskById(taskId)
     }

@@ -21,6 +21,12 @@ interface TaskDao {
     @Query("SELECT * FROM tasks")
     fun getAllTasksFLow(): Flow<List<Task>>
 
+    @Query("SELECT * FROM tasks WHERE isDone = 0")
+    fun getUnfinishedTasks(): Flow<List<Task>>
+
+    @Query("SELECT * FROM tasks WHERE isDone = 1")
+    fun getFinishedTasks(): Flow<List<Task>>
+
     @Query("SELECT * FROM tasks WHERE id = :taskId")
     fun loadTaskById(taskId: Int): Flow<Task>
 }
