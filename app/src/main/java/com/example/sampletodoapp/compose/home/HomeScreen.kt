@@ -53,66 +53,74 @@ fun HomeScreen(
             if (uiState.isEmpty) {
                 Text(text = "タスクが存在しません")
             } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                ) {
-                    Text(
-                        text = "未完了のタスク",
-                    )
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.unfinishedTasks.size) {
-                            val task = uiState.unfinishedTasks[it]
-                            TaskCard(
-                                task = task,
-                                onClick = {
-                                    navController.navigate("${Route.EditTask}/${task.id}")
-                                },
-                                onDelete = {
-                                    viewModel.deleteTask(task)
-                                },
-                                onComplete = {
-                                    viewModel.switchTask(task)
-                                }
-                            )
-                        }
+                TaskListContent(
+                    unfinishedTasks = uiState.unfinishedTasks,
+                    finishedTasks = uiState.finishedTasks,
+                    onClick = { task ->
+                        navController.navigate("${Route.EditTask}/${task.id}")
+                    },
+                    onDelete = { task ->
+                        viewModel.deleteTask(task)
+                    },
+                    onComplete = { task ->
+                        viewModel.switchTask(task)
                     }
-                    Text(
-                        text = "完了したタスク",
-                    )
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.finishedTasks.size) {
-                            val task = uiState.finishedTasks[it]
-                            TaskCard(
-                                task = task,
-                                onClick = {
-                                    navController.navigate("${Route.EditTask}/${task.id}")
-                                },
-                                onDelete = {
-                                    viewModel.deleteTask(task)
-                                },
-                                onComplete = {
-                                    viewModel.switchTask(task)
-                                }
-                            )
-                        }
-                    }
-                }
+                )
             }
         }
     }
 }
+
+@Composable
+fun TaskListContent(
+    unfinishedTasks: List<Task>,
+    finishedTasks: List<Task>,
+    onClick: (Task) -> Unit,
+    onDelete: (Task) -> Unit,
+    onComplete: (Task) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+    ) {
+        Text(text = "未完了のタスク")
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(unfinishedTasks.size) {
+                val task = unfinishedTasks[it]
+                TaskCard(
+                    task = task,
+                    onClick = { onClick(task) },
+                    onDelete = { onDelete(task) },
+                    onComplete = { onComplete(task) }
+                )
+            }
+        }
+        Text(text = "完了したタスク")
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(finishedTasks.size) {
+                val task = finishedTasks[it]
+                TaskCard(
+                    task = task,
+                    onClick = { onClick(task) },
+                    onDelete = { onDelete(task) },
+                    onComplete = { onComplete(task) }
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun TaskCard(

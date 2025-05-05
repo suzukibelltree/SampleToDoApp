@@ -47,79 +47,16 @@ fun AddTaskScreen(
     val uiState = viewModel.uiState.collectAsState()
     when (val state = uiState.value) {
         is AddTaskUiState.Input -> {
-            // タスク作成中のUIを表示
-            val scope = rememberCoroutineScope()
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
-            ) {
-                var showDatePicker by remember { mutableStateOf(false) }
-                // タスク名の入力
-                OutlinedTextField(
-                    value = state.title,
-                    onValueChange = { viewModel.updateTitle(newTitle = it) },
-                    label = { Text("タスクを入力") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    singleLine = true
-                )
-                // 期限の選択
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "期限日: ${state.deadline}", fontSize = 20.sp)
-                    OutlinedButton(
-                        onClick = { showDatePicker = true }
-                    ) {
-                        Text(
-                            text = "期日の選択",
-                        )
-                    }
+            AddTaskInputContent(
+                state = state,
+                onTitleChange = { viewModel.updateTitle(it) },
+                onDeadlineChange = { viewModel.updateDeadline(it) },
+                onImportanceChange = { viewModel.updateImportance(it.level) },
+                onSave = { task ->
+                    viewModel.saveTask(task)
+                    navController.navigate("home")
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(text = "重要度")
-                    ImportanceRadioButtons(
-                        selected = state.importance,
-                        onSelected = { viewModel.updateImportance(newImportance = it.level) }
-                    )
-                }
-                Button(
-                    onClick = {
-                        val task = Task(
-                            title = state.title,
-                            deadline = state.deadline,
-                            importance = state.importance.level
-                        )
-                        scope.launch {
-                            viewModel.saveTask(task) // タスクを保存
-                        }
-                        navController.navigate("home")
-                    }
-                ) {
-                    Text(text = "追加")
-                }
-                if (showDatePicker) {
-                    DatePickerModal(
-                        onDateSelected = { date ->
-                            showDatePicker = false
-                            viewModel.updateDeadline(
-                                newDeadline = date?.let { convertMillisToDate(it) } ?: ""
-                            )
-                        },
-                        onDismiss = { showDatePicker = false }
-                    )
-                }
-            }
+            )
         }
 
         is AddTaskUiState.Saving -> {
@@ -129,6 +66,85 @@ fun AddTaskScreen(
 
         is AddTaskUiState.Success -> {
             // タスク保存成功時のUIを表示
+        }
+    }
+}
+
+@Composable
+fun AddTaskInputContent(
+    state: AddTaskUiState.Input,
+    onTitleChange: (String) -> Unit,
+    onDeadlineChange: (String) -> Unit,
+    onImportanceChange: (TaskPriority) -> Unit,
+    onSave: (Task) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+    ) {
+        // タイトル入力
+        OutlinedTextField(
+            value = state.title,
+            onValueChange = onTitleChange,
+            label = { Text("タスクを入力") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            singleLine = true
+        )
+
+        // 期限選択
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "期限日: ${state.deadline}", fontSize = 20.sp)
+            OutlinedButton(onClick = { showDatePicker = true }) {
+                Text("期日の選択")
+            }
+        }
+
+        // 重要度選択
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "重要度")
+            ImportanceRadioButtons(
+                selected = state.importance,
+                onSelected = onImportanceChange
+            )
+        }
+
+        // 追加ボタン
+        Button(
+            onClick = {
+                val task = Task(
+                    title = state.title,
+                    deadline = state.deadline,
+                    importance = state.importance.level
+                )
+                scope.launch { onSave(task) }
+            }
+        ) {
+            Text("追加")
+        }
+
+        // 日付ピッカー表示
+        if (showDatePicker) {
+            DatePickerModal(
+                onDateSelected = { millis ->
+                    showDatePicker = false
+                    onDeadlineChange(millis?.let { convertMillisToDate(it) } ?: "")
+                },
+                onDismiss = { showDatePicker = false }
+            )
         }
     }
 }
