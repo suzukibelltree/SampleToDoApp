@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/// タスク編集画面のUI状態
 sealed interface EditTaskUiState {
+    // タスクの編集状態
     data class Edit(
         val id: Int,
         val title: String,
@@ -22,7 +24,10 @@ sealed interface EditTaskUiState {
         val isDone: Boolean
     ) : EditTaskUiState
 
+    // タスクのロード中状態
     data object Loading : EditTaskUiState
+
+    // タスクの保存成功状態
     data object Success : EditTaskUiState
 }
 
@@ -36,9 +41,11 @@ class EditTaskViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<EditTaskUiState>(EditTaskUiState.Loading)
     val uiState: StateFlow<EditTaskUiState> = _uiState
 
+    // ViewModelの初期化処理
     init {
         viewModelScope.launch {
             val task = tasksRepository.loadTaskById(taskId).first()
+            // UI状態をLoadingからEditに変更している
             _uiState.value = EditTaskUiState.Edit(
                 id = task.id,
                 title = task.title,
@@ -82,6 +89,7 @@ class EditTaskViewModel @Inject constructor(
     }
 
     // タスクの更新
+    // 処理の中でUI状態を変更している
     fun saveTask() {
         val current = _uiState.value
         if (current is EditTaskUiState.Edit) {

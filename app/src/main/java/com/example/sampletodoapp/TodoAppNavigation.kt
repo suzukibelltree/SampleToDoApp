@@ -10,6 +10,9 @@ import com.example.sampletodoapp.compose.addtask.AddTaskScreen
 import com.example.sampletodoapp.compose.edittask.EditTaskScreen
 import com.example.sampletodoapp.compose.home.HomeScreen
 
+/**
+ * アプリケーションのナビゲーションを管理するComposable関数
+ */
 @Composable
 fun TodoAppNavigation(
     modifier: Modifier,

@@ -39,11 +39,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * タスク追加画面のUIを表示するComposable関数
+ * @param viewModel タスク追加画面のViewModel
+ * @param navController ナビゲーションコントローラー
+ */
 @Composable
 fun AddTaskScreen(
     viewModel: AddTaskViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    // correctAsStateにより、ViewModel側で管理されているUI状態を監視し、状態の変更を検知できる
     val uiState = viewModel.uiState.collectAsState()
     when (val state = uiState.value) {
         is AddTaskUiState.Input -> {
@@ -70,6 +76,15 @@ fun AddTaskScreen(
     }
 }
 
+/**
+ * タスク追加画面の入力内容を表示するComposable関数
+ * @param state タスク追加画面のUI状態
+ * @param onTitleChange タイトル変更時のコールバック
+ * @param onDeadlineChange 期限日変更時のコールバック
+ * @param onImportanceChange 重要度変更時のコールバック
+ * @param onSave タスク保存時のコールバック
+ * 親コンポーザブルでイベントを制御できるようにしている
+ */
 @Composable
 fun AddTaskInputContent(
     state: AddTaskUiState.Input,
@@ -149,6 +164,11 @@ fun AddTaskInputContent(
     }
 }
 
+/**
+ * 日付ピッカーのモーダルを表示するComposable関数
+ * @param onDateSelected 日付選択時のコールバック
+ * @param onDismiss モーダルが閉じられた時のコールバック
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
@@ -177,6 +197,11 @@ fun DatePickerModal(
     }
 }
 
+/**
+ * 重要度選択のラジオボタンを表示するComposable関数
+ * @param selected 選択された重要度
+ * @param onSelected 重要度選択時のコールバック
+ */
 @Composable
 fun ImportanceRadioButtons(
     selected: TaskPriority,

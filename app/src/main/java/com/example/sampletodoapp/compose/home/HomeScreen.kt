@@ -29,6 +29,11 @@ import com.example.sampletodoapp.Route
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 
+/**
+ * タスク一覧画面のUIを表示するComposable関数
+ * @param viewModel タスク一覧画面のViewModel
+ * @param navController ナビゲーションコントローラー
+ */
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
@@ -71,6 +76,14 @@ fun HomeScreen(
     }
 }
 
+/**
+ * タスク一覧画面のUIコンテンツを表示するComposable関数
+ * @param unfinishedTasks 未完了のタスクのリスト
+ * @param finishedTasks 完了したタスクのリスト
+ * @param onClick タスククリック時のコールバック
+ * @param onDelete タスク削除時のコールバック
+ * @param onComplete タスク完了時のコールバック
+ */
 @Composable
 fun TaskListContent(
     unfinishedTasks: List<Task>,
@@ -121,7 +134,13 @@ fun TaskListContent(
     }
 }
 
-
+/**
+ * タスクカードのUIを表示するComposable関数
+ * @param task タスクのデータ
+ * @param onClick タスククリック時のコールバック
+ * @param onDelete タスク削除時のコールバック
+ * @param onComplete タスク完了時のコールバック
+ */
 @Composable
 fun TaskCard(
     task: Task,

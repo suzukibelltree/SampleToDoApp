@@ -28,6 +28,11 @@ import com.example.sampletodoapp.compose.addtask.ImportanceRadioButtons
 import com.example.sampletodoapp.compose.addtask.convertMillisToDate
 import kotlinx.coroutines.launch
 
+/**
+ * タスク編集画面のUIを表示するComposable関数
+ * @param viewModel タスク編集画面のViewModel
+ * @param navController ナビゲーションコントローラー
+ */
 @Composable
 fun EditTaskScreen(
     viewModel: EditTaskViewModel = hiltViewModel(),
@@ -40,10 +45,13 @@ fun EditTaskScreen(
         }
 
         is EditTaskUiState.Edit -> {
+            var showDatePicker by remember { mutableStateOf(false) }
             EditTaskContent(
                 task = state,
                 viewModel = viewModel,
-                navController = navController
+                navController = navController,
+                showDatePicker = showDatePicker,
+                onShowDatePickerChange = { showDatePicker = it }
             )
         }
 
@@ -53,14 +61,21 @@ fun EditTaskScreen(
     }
 }
 
+/**
+ * タスク編集画面のUIコンテンツを表示するComposable関数
+ * @param task 編集するタスクの状態
+ * @param viewModel タスク編集画面のViewModel
+ * @param navController ナビゲーションコントローラー
+ */
 @Composable
 fun EditTaskContent(
     task: EditTaskUiState.Edit,
     viewModel: EditTaskViewModel,
-    navController: NavController
+    navController: NavController,
+    showDatePicker: Boolean,
+    onShowDatePickerChange: (Boolean) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var showDatePicker by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -90,7 +105,7 @@ fun EditTaskContent(
         ) {
             Text(text = "期限日: ${task.deadline}", fontSize = 20.sp)
             OutlinedButton(
-                onClick = { showDatePicker = true }
+                onClick = { onShowDatePickerChange(true) },
             ) {
                 Text(text = "期日の選択")
             }
@@ -137,12 +152,12 @@ fun EditTaskContent(
         if (showDatePicker) {
             DatePickerModal(
                 onDateSelected = { date ->
-                    showDatePicker = false
+                    onShowDatePickerChange(false)
                     viewModel.updateDeadline(
                         newDeadline = date?.let { convertMillisToDate(it) } ?: ""
                     )
                 },
-                onDismiss = { showDatePicker = false }
+                onDismiss = { onShowDatePickerChange(false) }
             )
         }
     }

@@ -12,14 +12,17 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface AddTaskUiState {
+    // タスクの入力状態
     data class Input(
         val title: String = "",
         val deadline: String = "",
         val importance: TaskPriority = TaskPriority.MEDIUM,
     ) : AddTaskUiState
 
+    // タスクの保存中状態
     data object Saving : AddTaskUiState
 
+    // タスクの保存成功状態
     data object Success : AddTaskUiState
 }
 
@@ -28,7 +31,10 @@ class AddTaskViewModel @Inject constructor(
     private val taskRepository: TasksRepository
 ) :
     ViewModel() {
+    // 内部保存用
     private val _uiState = MutableStateFlow<AddTaskUiState>(AddTaskUiState.Input())
+
+    // 外部公開用(外部からは変更できない)
     val uiState: StateFlow<AddTaskUiState> = _uiState
 
     // タスクのタイトルの更新
@@ -56,6 +62,8 @@ class AddTaskViewModel @Inject constructor(
         }
     }
 
+    // タスクの保存
+    // 処理の中でUI状態を変更している
     fun saveTask(task: Task) {
         viewModelScope.launch {
             _uiState.value = AddTaskUiState.Saving

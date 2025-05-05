@@ -15,6 +15,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sampletodoapp.ui.theme.SampleToDoAppTheme
 
+/**
+ * SampleTodoAppのメインComposable関数
+ */
 @Composable
 fun SampleTodoApp() {
     SampleToDoAppTheme {
