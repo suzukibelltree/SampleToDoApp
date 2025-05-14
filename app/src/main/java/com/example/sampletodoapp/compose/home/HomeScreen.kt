@@ -172,6 +172,7 @@ fun TaskCard(
                     fontSize = 16.sp
                 )
                 Text(text = task.deadline, fontSize = 16.sp)
+                Text(text = "達成度：${task.progress}%", fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.weight(1f))
             Icon(
