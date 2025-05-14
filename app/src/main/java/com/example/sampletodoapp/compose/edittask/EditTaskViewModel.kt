@@ -21,6 +21,7 @@ sealed interface EditTaskUiState {
         val title: String,
         val deadline: String,
         val importance: TaskPriority,
+        val progress: Int,
         val isDone: Boolean
     ) : EditTaskUiState
 
@@ -51,7 +52,8 @@ class EditTaskViewModel @Inject constructor(
                 title = task.title,
                 deadline = task.deadline,
                 importance = TaskPriority.fromLevel(task.importance),
-                isDone = task.isDone
+                isDone = task.isDone,
+                progress = task.progress
             )
         }
     }
@@ -80,11 +82,26 @@ class EditTaskViewModel @Inject constructor(
         }
     }
 
+    // タスクの進捗度の更新
+    fun updateProgress(newProgress: Int) {
+        val current = _uiState.value
+        if (current is EditTaskUiState.Edit) {
+            _uiState.value = current.copy(
+                progress = newProgress,
+                isDone = (newProgress == 100)
+            )
+        }
+    }
+
     // タスクの完了状態の更新
     fun toggleIsDone() {
         val current = _uiState.value
         if (current is EditTaskUiState.Edit) {
-            _uiState.value = current.copy(isDone = !current.isDone)
+            val newIsDone = !current.isDone
+            _uiState.value = current.copy(
+                isDone = newIsDone,
+                progress = if (newIsDone) 100 else 0
+            )
         }
     }
 
@@ -99,6 +116,7 @@ class EditTaskViewModel @Inject constructor(
                     title = current.title,
                     deadline = current.deadline,
                     importance = current.importance.level,
+                    progress = current.progress,
                     isDone = current.isDone
                 )
                 tasksRepository.updateTask(updatedTask)

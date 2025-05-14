@@ -55,7 +55,13 @@ class HomeViewModel @Inject constructor(
     // タスクの完了
     fun switchTask(task: Task) {
         viewModelScope.launch {
-            tasksRepository.updateTask(task.copy(isDone = !task.isDone))
+            val newIsDone = !task.isDone
+            tasksRepository.updateTask(
+                task.copy(
+                    isDone = newIsDone,
+                    progress = if (newIsDone) 100 else 0
+                )
+            )
         }
     }
 }

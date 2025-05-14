@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -122,6 +123,12 @@ fun EditTaskContent(
             )
         }
 
+        // タスクの進捗を示すスライダー
+        ProgressSlider(
+            progress = task.progress,
+            onProgressChange = { viewModel.updateProgress(newProgress = it) }
+        )
+
         // タスクの完了状態切り替え
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -162,3 +169,28 @@ fun EditTaskContent(
         }
     }
 }
+
+
+@Composable
+fun ProgressSlider(
+    progress: Int,
+    onProgressChange: (Int) -> Unit = {},
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Slider(
+            value = progress.toFloat(),
+            onValueChange = { newPosition ->
+                onProgressChange(newPosition.toInt())
+            },
+            steps = 9,
+            valueRange = 0f..100f
+        )
+        Text(text = "達成度：${progress}%")
+    }
+}
+
