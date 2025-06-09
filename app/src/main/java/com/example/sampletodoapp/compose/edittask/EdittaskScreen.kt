@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.sampletodoapp.compose.addtask.DatePickerModal
 import com.example.sampletodoapp.compose.addtask.ImportanceRadioButtons
 import com.example.sampletodoapp.compose.addtask.convertMillisToDate
@@ -32,12 +31,11 @@ import kotlinx.coroutines.launch
 /**
  * タスク編集画面のUIを表示するComposable関数
  * @param viewModel タスク編集画面のViewModel
- * @param navController ナビゲーションコントローラー
  */
 @Composable
 fun EditTaskScreen(
     viewModel: EditTaskViewModel = hiltViewModel(),
-    navController: NavController,
+    onNavigateToHome: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsState()
     when (val state = uiState.value) {
@@ -50,7 +48,7 @@ fun EditTaskScreen(
             EditTaskContent(
                 task = state,
                 viewModel = viewModel,
-                navController = navController,
+                onNavigateToHome = onNavigateToHome,
                 showDatePicker = showDatePicker,
                 onShowDatePickerChange = { showDatePicker = it }
             )
@@ -66,13 +64,12 @@ fun EditTaskScreen(
  * タスク編集画面のUIコンテンツを表示するComposable関数
  * @param task 編集するタスクの状態
  * @param viewModel タスク編集画面のViewModel
- * @param navController ナビゲーションコントローラー
  */
 @Composable
 fun EditTaskContent(
     task: EditTaskUiState.Edit,
     viewModel: EditTaskViewModel,
-    navController: NavController,
+    onNavigateToHome: () -> Unit,
     showDatePicker: Boolean,
     onShowDatePickerChange: (Boolean) -> Unit
 ) {
@@ -149,7 +146,7 @@ fun EditTaskContent(
                 scope.launch {
                     viewModel.saveTask()
                 }
-                navController.navigate("home")
+                onNavigateToHome()
             }
         ) {
             Text(text = "更新")

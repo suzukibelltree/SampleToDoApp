@@ -24,20 +24,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.sampletodoapp.Route
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 
 /**
  * タスク一覧画面のUIを表示するComposable関数
  * @param viewModel タスク一覧画面のViewModel
- * @param navController ナビゲーションコントローラー
  */
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    navController: NavController
+    onNavigateToEditTask: (taskId: Int) -> Unit
 ) {
     val state = viewModel.uiState.collectAsState()
     when (val uiState = state.value) {
@@ -62,7 +59,7 @@ fun HomeScreen(
                     unfinishedTasks = uiState.unfinishedTasks,
                     finishedTasks = uiState.finishedTasks,
                     onClick = { task ->
-                        navController.navigate("${Route.EditTask}/${task.id}")
+                        onNavigateToEditTask(task.id)
                     },
                     onDelete = { task ->
                         viewModel.deleteTask(task)

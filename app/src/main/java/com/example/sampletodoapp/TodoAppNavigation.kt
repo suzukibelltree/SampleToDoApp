@@ -24,10 +24,18 @@ fun TodoAppNavigation(
         modifier = modifier
     ) {
         composable(Route.Home) {
-            HomeScreen(navController = navController)
+            HomeScreen(
+                onNavigateToEditTask = { taskId ->
+                    navController.navigate("${Route.EditTask}/$taskId")
+                }
+            )
         }
         composable(Route.AddTask) {
-            AddTaskScreen(navController = navController)
+            AddTaskScreen(
+                onNavigateToHome = {
+                    navController.navigate(Route.Home)
+                }
+            )
         }
         composable(
             route = "${Route.EditTask}/{taskId}",
@@ -37,7 +45,11 @@ fun TodoAppNavigation(
                 }
             )
         ) {
-            EditTaskScreen(navController = navController)
+            EditTaskScreen(
+                onNavigateToHome = {
+                    navController.navigate(Route.Home)
+                }
+            )
         }
     }
 }

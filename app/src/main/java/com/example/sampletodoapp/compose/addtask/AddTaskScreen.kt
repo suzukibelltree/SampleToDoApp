@@ -31,7 +31,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 import kotlinx.coroutines.launch
@@ -42,12 +41,11 @@ import java.util.Locale
 /**
  * タスク追加画面のUIを表示するComposable関数
  * @param viewModel タスク追加画面のViewModel
- * @param navController ナビゲーションコントローラー
  */
 @Composable
 fun AddTaskScreen(
     viewModel: AddTaskViewModel = hiltViewModel(),
-    navController: NavController
+    onNavigateToHome: () -> Unit,
 ) {
     // correctAsStateにより、ViewModel側で管理されているUI状態を監視し、状態の変更を検知できる
     val uiState = viewModel.uiState.collectAsState()
@@ -60,7 +58,7 @@ fun AddTaskScreen(
                 onImportanceChange = { viewModel.updateImportance(it.level) },
                 onSave = { task ->
                     viewModel.saveTask(task)
-                    navController.navigate("home")
+                    onNavigateToHome() // タスク保存後にホーム画面へ戻る
                 }
             )
         }
