@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -125,7 +127,7 @@ fun TaskListContent(
                     task = task,
                     onClick = { onClick(task) },
                     onDelete = { onDelete(task) },
-                    onComplete = { onComplete(task) }
+                    onComplete = { onComplete(task) },
                 )
             }
         }
@@ -144,12 +146,16 @@ fun TaskCard(
     task: Task,
     onClick: () -> Unit,
     onDelete: () -> Unit,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
+    color: Long = task.color // デフォルトはタスクの色
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(color)
+        )
     ) {
         Row(
             modifier = Modifier
@@ -169,7 +175,7 @@ fun TaskCard(
                     text = "重要度: ${TaskPriority.fromLevel(task.importance).label}",
                     fontSize = 16.sp
                 )
-                Text(text = task.deadline, fontSize = 16.sp)
+                Text(text = "期日：${task.deadline}", fontSize = 16.sp)
                 Text(text = "達成度：${task.progress}%", fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.weight(1f))

@@ -19,6 +19,7 @@ data class Task(
     val title: String,
     val deadline: String,
     val importance: Int,
+    val color: Long,
     val progress: Int = 0,
     val isDone: Boolean = false
 )

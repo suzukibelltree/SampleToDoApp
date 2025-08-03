@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.sampletodoapp.compose.edittask.SelectColorSection
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 import kotlinx.coroutines.launch
@@ -59,6 +60,9 @@ fun AddTaskScreen(
                 onSave = { task ->
                     viewModel.saveTask(task)
                     onNavigateToHome() // タスク保存後にホーム画面へ戻る
+                },
+                onColorChange = { color ->
+                    viewModel.updateColor(color)
                 }
             )
         }
@@ -89,6 +93,7 @@ fun AddTaskInputContent(
     onTitleChange: (String) -> Unit,
     onDeadlineChange: (String) -> Unit,
     onImportanceChange: (TaskPriority) -> Unit,
+    onColorChange: (Long) -> Unit,
     onSave: (Task) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -135,13 +140,21 @@ fun AddTaskInputContent(
             )
         }
 
+        SelectColorSection(
+            selectedColor = state.color,
+            onColorSelected = { color ->
+                scope.launch { onColorChange(color) }
+            }
+        )
+
         // 追加ボタン
         Button(
             onClick = {
                 val task = Task(
                     title = state.title,
                     deadline = state.deadline,
-                    importance = state.importance.level
+                    importance = state.importance.level,
+                    color = state.color,
                 )
                 scope.launch { onSave(task) }
             }

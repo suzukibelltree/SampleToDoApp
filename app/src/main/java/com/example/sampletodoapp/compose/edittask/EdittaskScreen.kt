@@ -1,11 +1,16 @@
 package com.example.sampletodoapp.compose.edittask
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -24,12 +29,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sampletodoapp.compose.addtask.DatePickerModal
 import com.example.sampletodoapp.compose.addtask.ImportanceRadioButtons
 import com.example.sampletodoapp.compose.addtask.convertMillisToDate
+import com.example.sampletodoapp.room.TaskColors
 import kotlinx.coroutines.launch
 
 /**
@@ -140,6 +148,12 @@ fun EditTaskContent(
             )
         }
 
+        // TODO: 色の選択機能を実装
+        SelectColorSection(
+            selectedColor = task.color,
+            onColorSelected = { viewModel.updateColor(newColor = it) }
+        )
+
         // タスクの進捗を示すスライダー
         ProgressSlider(
             progress = task.progress,
@@ -211,6 +225,33 @@ fun ProgressSlider(
             valueRange = 0f..100f
         )
         Text(text = "達成度：${progress}%")
+    }
+}
+
+@Composable
+fun SelectColorSection(
+    selectedColor: Long,
+    onColorSelected: (Long) -> Unit = {}
+) {
+    val colors = TaskColors.colors
+
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "色の選択", modifier = Modifier.padding(end = 8.dp))
+        colors.forEach { color ->
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(color))
+                    .border(
+                        width = if (selectedColor == color) 3.dp else 1.dp,
+                        color = if (selectedColor == color) Color.Black else Color.Gray,
+                        shape = CircleShape
+                    )
+                    .clickable { onColorSelected(color) }
+            )
+        }
     }
 }
 

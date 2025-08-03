@@ -21,6 +21,7 @@ sealed interface EditTaskUiState {
         val title: String,
         val deadline: String,
         val importance: TaskPriority,
+        val color: Long,
         val progress: Int,
         val isDone: Boolean
     ) : EditTaskUiState
@@ -53,7 +54,8 @@ class EditTaskViewModel @Inject constructor(
                 deadline = task.deadline,
                 importance = TaskPriority.fromLevel(task.importance),
                 isDone = task.isDone,
-                progress = task.progress
+                progress = task.progress,
+                color = task.color
             )
         }
     }
@@ -79,6 +81,13 @@ class EditTaskViewModel @Inject constructor(
         val current = _uiState.value
         if (current is EditTaskUiState.Edit) {
             _uiState.value = current.copy(importance = TaskPriority.fromLevel(newImportance))
+        }
+    }
+
+    fun updateColor(newColor: Long) {
+        val current = _uiState.value
+        if (current is EditTaskUiState.Edit) {
+            _uiState.value = current.copy(color = newColor)
         }
     }
 
@@ -116,6 +125,7 @@ class EditTaskViewModel @Inject constructor(
                     title = current.title,
                     deadline = current.deadline,
                     importance = current.importance.level,
+                    color = current.color,
                     progress = current.progress,
                     isDone = current.isDone
                 )
