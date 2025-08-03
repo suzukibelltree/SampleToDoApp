@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 
@@ -33,14 +32,15 @@ import com.example.sampletodoapp.room.TaskPriority
  */
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToEditTask: (taskId: Int) -> Unit
+    viewModel: HomeViewModel,
+    onNavigateToEditTask: (taskId: Int) -> Unit,
+    modifier: Modifier
 ) {
     val state = viewModel.uiState.collectAsState()
     when (val uiState = state.value) {
         is HomeUiState.Loading -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,7 +66,8 @@ fun HomeScreen(
                     },
                     onComplete = { task ->
                         viewModel.switchTask(task)
-                    }
+                    },
+                    modifier = modifier
                 )
             }
         }
@@ -87,12 +88,12 @@ fun TaskListContent(
     finishedTasks: List<Task>,
     onClick: (Task) -> Unit,
     onDelete: (Task) -> Unit,
-    onComplete: (Task) -> Unit
+    onComplete: (Task) -> Unit,
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = modifier
+            .padding(16.dp)
     ) {
         Text(text = "未完了のタスク")
         LazyColumn(
