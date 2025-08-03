@@ -1,11 +1,15 @@
 package com.example.sampletodoapp.compose.edittask
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
@@ -82,6 +86,22 @@ fun EditTaskContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .align(Alignment.Start)
+                .clickable { onNavigateToHome() }
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+            )
+            Text(
+                text = "戻る",
+                fontSize = 20.sp
+            )
+
+        }
         // タスク名の入力
         OutlinedTextField(
             value = task.title,
@@ -89,7 +109,7 @@ fun EditTaskContent(
             label = { Text("タスクを入力") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             singleLine = true
         )
 
@@ -97,7 +117,7 @@ fun EditTaskContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -147,7 +167,10 @@ fun EditTaskContent(
                     viewModel.saveTask()
                 }
                 onNavigateToHome()
-            }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Text(text = "更新")
         }
