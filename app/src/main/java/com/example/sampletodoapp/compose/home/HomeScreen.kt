@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ fun HomeScreen(
     onNavigateToEditTask: (taskId: Int) -> Unit,
     modifier: Modifier
 ) {
+    val selectedPriority = viewModel.selectedPriority.collectAsState()
     val state = viewModel.uiState.collectAsState()
     when (val uiState = state.value) {
         is HomeUiState.Loading -> {
@@ -57,22 +59,70 @@ fun HomeScreen(
             if (uiState.isEmpty) {
                 Text(text = "タスクが存在しません")
             } else {
-                TaskListContent(
-                    unfinishedTasks = uiState.unfinishedTasks,
-                    finishedTasks = uiState.finishedTasks,
-                    onClick = { task ->
-                        onNavigateToEditTask(task.id)
-                    },
-                    onDelete = { task ->
-                        viewModel.deleteTask(task)
-                    },
-                    onComplete = { task ->
-                        viewModel.switchTask(task)
-                    },
-                    modifier = modifier
-                )
+                Column(
+                    modifier = modifier.padding(8.dp)
+                ) {
+                    TaskFilter(
+                        selectedFilter = selectedPriority.value,
+                        onFilterSelected = { priority ->
+                            viewModel.filterTasks(priority)
+                        }
+                    )
+                    TaskListContent(
+                        unfinishedTasks = uiState.unfinishedTasks,
+                        finishedTasks = uiState.finishedTasks,
+                        onClick = { task ->
+                            onNavigateToEditTask(task.id)
+                        },
+                        onDelete = { task ->
+                            viewModel.deleteTask(task)
+                        },
+                        onComplete = { task ->
+                            viewModel.switchTask(task)
+                        },
+                    )
+                }
             }
         }
+    }
+}
+
+/**
+ * タスクのフィルタリングUIを表示するComposable関数
+ * @param selectedFilter 現在選択されているフィルタ
+ * @param onFilterSelected フィルタが選択されたときのコールバック
+ */
+@Composable
+fun TaskFilter(
+    selectedFilter: TaskPriority?,
+    onFilterSelected: (TaskPriority?) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilterChip(
+            selected = selectedFilter == null,
+            onClick = { onFilterSelected(null) }, // 全てのタスクを表示
+            label = { Text("All") },
+        )
+        FilterChip(
+            selected = selectedFilter == TaskPriority.HIGH,
+            onClick = { onFilterSelected(TaskPriority.HIGH) },
+            label = { Text("重要度:高") },
+        )
+        FilterChip(
+            selected = selectedFilter == TaskPriority.MEDIUM,
+            onClick = { onFilterSelected(TaskPriority.MEDIUM) },
+            label = { Text("重要度:中") },
+        )
+        FilterChip(
+            selected = selectedFilter == TaskPriority.LOW,
+            onClick = { onFilterSelected(TaskPriority.LOW) },
+            label = { Text("重要度:低") },
+        )
     }
 }
 
@@ -91,11 +141,9 @@ fun TaskListContent(
     onClick: (Task) -> Unit,
     onDelete: (Task) -> Unit,
     onComplete: (Task) -> Unit,
-    modifier: Modifier
 ) {
     Column(
-        modifier = modifier
-            .padding(16.dp)
+
     ) {
         Text(text = "未完了のタスク")
         LazyColumn(
