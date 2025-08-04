@@ -6,9 +6,9 @@ package com.example.sampletodoapp.room
  * @param label 優先度のラベル
  */
 enum class TaskPriority(val level: Int, val label: String) {
-    HIGH(1, "低"),
+    HIGH(1, "高"),
     MEDIUM(2, "中"),
-    LOW(3, "高");
+    LOW(3, "低");
 
     companion object {
         fun fromLevel(level: Int): TaskPriority {

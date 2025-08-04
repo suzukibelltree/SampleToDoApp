@@ -13,37 +13,38 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.sampletodoapp.Route
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 
 /**
  * タスク一覧画面のUIを表示するComposable関数
  * @param viewModel タスク一覧画面のViewModel
- * @param navController ナビゲーションコントローラー
  */
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: HomeViewModel,
+    onNavigateToEditTask: (taskId: Int) -> Unit,
+    modifier: Modifier
 ) {
+    val selectedPriority = viewModel.selectedPriority.collectAsState()
     val state = viewModel.uiState.collectAsState()
     when (val uiState = state.value) {
         is HomeUiState.Loading -> {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -58,21 +59,70 @@ fun HomeScreen(
             if (uiState.isEmpty) {
                 Text(text = "タスクが存在しません")
             } else {
-                TaskListContent(
-                    unfinishedTasks = uiState.unfinishedTasks,
-                    finishedTasks = uiState.finishedTasks,
-                    onClick = { task ->
-                        navController.navigate("${Route.EditTask}/${task.id}")
-                    },
-                    onDelete = { task ->
-                        viewModel.deleteTask(task)
-                    },
-                    onComplete = { task ->
-                        viewModel.switchTask(task)
-                    }
-                )
+                Column(
+                    modifier = modifier.padding(8.dp)
+                ) {
+                    TaskFilter(
+                        selectedFilter = selectedPriority.value,
+                        onFilterSelected = { priority ->
+                            viewModel.filterTasks(priority)
+                        }
+                    )
+                    TaskListContent(
+                        unfinishedTasks = uiState.unfinishedTasks,
+                        finishedTasks = uiState.finishedTasks,
+                        onClick = { task ->
+                            onNavigateToEditTask(task.id)
+                        },
+                        onDelete = { task ->
+                            viewModel.deleteTask(task)
+                        },
+                        onComplete = { task ->
+                            viewModel.switchTask(task)
+                        },
+                    )
+                }
             }
         }
+    }
+}
+
+/**
+ * タスクのフィルタリングUIを表示するComposable関数
+ * @param selectedFilter 現在選択されているフィルタ
+ * @param onFilterSelected フィルタが選択されたときのコールバック
+ */
+@Composable
+fun TaskFilter(
+    selectedFilter: TaskPriority?,
+    onFilterSelected: (TaskPriority?) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilterChip(
+            selected = selectedFilter == null,
+            onClick = { onFilterSelected(null) }, // 全てのタスクを表示
+            label = { Text("All") },
+        )
+        FilterChip(
+            selected = selectedFilter == TaskPriority.HIGH,
+            onClick = { onFilterSelected(TaskPriority.HIGH) },
+            label = { Text("重要度:高") },
+        )
+        FilterChip(
+            selected = selectedFilter == TaskPriority.MEDIUM,
+            onClick = { onFilterSelected(TaskPriority.MEDIUM) },
+            label = { Text("重要度:中") },
+        )
+        FilterChip(
+            selected = selectedFilter == TaskPriority.LOW,
+            onClick = { onFilterSelected(TaskPriority.LOW) },
+            label = { Text("重要度:低") },
+        )
     }
 }
 
@@ -90,12 +140,10 @@ fun TaskListContent(
     finishedTasks: List<Task>,
     onClick: (Task) -> Unit,
     onDelete: (Task) -> Unit,
-    onComplete: (Task) -> Unit
+    onComplete: (Task) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+
     ) {
         Text(text = "未完了のタスク")
         LazyColumn(
@@ -127,7 +175,7 @@ fun TaskListContent(
                     task = task,
                     onClick = { onClick(task) },
                     onDelete = { onDelete(task) },
-                    onComplete = { onComplete(task) }
+                    onComplete = { onComplete(task) },
                 )
             }
         }
@@ -146,12 +194,16 @@ fun TaskCard(
     task: Task,
     onClick: () -> Unit,
     onDelete: () -> Unit,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
+    color: Long = task.color // デフォルトはタスクの色
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(color)
+        )
     ) {
         Row(
             modifier = Modifier
@@ -171,7 +223,7 @@ fun TaskCard(
                     text = "重要度: ${TaskPriority.fromLevel(task.importance).label}",
                     fontSize = 16.sp
                 )
-                Text(text = task.deadline, fontSize = 16.sp)
+                Text(text = "期日：${task.deadline}", fontSize = 16.sp)
                 Text(text = "達成度：${task.progress}%", fontSize = 16.sp)
             }
             Spacer(modifier = Modifier.weight(1f))

@@ -17,6 +17,7 @@ sealed interface AddTaskUiState {
         val title: String = "",
         val deadline: String = "",
         val importance: TaskPriority = TaskPriority.MEDIUM,
+        val color: Long = 0xFFd3d3d3 // デフォルトの色を設定
     ) : AddTaskUiState
 
     // タスクの保存中状態
@@ -59,6 +60,13 @@ class AddTaskViewModel @Inject constructor(
 
         if (current is AddTaskUiState.Input) {
             _uiState.value = current.copy(importance = TaskPriority.fromLevel(newImportance))
+        }
+    }
+
+    fun updateColor(newColor: Long) {
+        val current = _uiState.value
+        if (current is AddTaskUiState.Input) {
+            _uiState.value = current.copy(color = newColor)
         }
     }
 
