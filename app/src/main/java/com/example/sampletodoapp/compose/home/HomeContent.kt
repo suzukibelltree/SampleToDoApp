@@ -11,14 +11,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.sampletodoapp.Route
+import com.example.sampletodoapp.compose.dailytasks.DailyTasksScreen
 
 @Composable
 fun HomeTabContent(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabTitles = listOf("タスク一覧", "本日のタスク")
@@ -41,7 +40,6 @@ fun HomeTabContent(
             0 -> {
                 // タスク一覧のタブが選択された場合の処理
                 HomeScreen(
-                    viewModel = viewModel,
                     onNavigateToEditTask = { taskId ->
                         navController.navigate("${Route.EditTask}/$taskId")
                     },
@@ -51,9 +49,11 @@ fun HomeTabContent(
 
             1 -> {
                 // 本日のタスクのタブが選択された場合の処理
-                Text(
-                    text = "本日のタスクはまだ実装されていません",
-                    modifier = Modifier.padding(innerPadding)
+                DailyTasksScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    onNavigateToEditTask = { taskId ->
+                        navController.navigate("${Route.EditTask}/$taskId")
+                    }
                 )
             }
         }

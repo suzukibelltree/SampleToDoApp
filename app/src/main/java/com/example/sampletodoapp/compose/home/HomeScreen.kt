@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sampletodoapp.room.Task
 import com.example.sampletodoapp.room.TaskPriority
 
@@ -35,7 +36,7 @@ import com.example.sampletodoapp.room.TaskPriority
  */
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToEditTask: (taskId: Int) -> Unit,
     modifier: Modifier
 ) {
