@@ -53,7 +53,7 @@ class HomeViewModel @Inject constructor(
             selectedPriority = priority,
             isEmpty = (finishedTasks.isEmpty() && unfinishedTasks.isEmpty())
         )
-    }.stateIn( // FlowをStateFlowに変換することにより、コンポーザブル関数側で監視可能にする
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = HomeUiState.Loading
