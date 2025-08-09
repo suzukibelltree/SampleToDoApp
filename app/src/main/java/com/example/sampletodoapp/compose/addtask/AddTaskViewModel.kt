@@ -28,7 +28,7 @@ sealed interface AddTaskUiState {
 }
 
 @HiltViewModel
-class AddTaskViewModel @Inject constructor(
+open class AddTaskViewModel @Inject constructor(
     private val taskRepository: TasksRepository
 ) :
     ViewModel() {
@@ -36,7 +36,7 @@ class AddTaskViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AddTaskUiState>(AddTaskUiState.Input())
 
     // 外部公開用(外部からは変更できない)
-    val uiState: StateFlow<AddTaskUiState> = _uiState
+    open val uiState: StateFlow<AddTaskUiState> = _uiState
 
     // タスクのタイトルの更新
     fun updateTitle(newTitle: String) {

@@ -1,6 +1,7 @@
 package com.example.sampletodoapp.compose.addtask
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -113,7 +115,8 @@ fun AddTaskInputContent(
             label = { Text("タスクを入力") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .testTag("input_task_title"),
             singleLine = true
         )
 
@@ -126,8 +129,13 @@ fun AddTaskInputContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "期限日: ${state.deadline}", fontSize = 20.sp)
-            OutlinedButton(onClick = { showDatePicker = true }) {
-                Text("期日の選択")
+            OutlinedButton(
+                onClick = { showDatePicker = true },
+                modifier = Modifier.testTag("button_open_date_picker")
+            ) {
+                Text(
+                    text = "期日の選択",
+                )
             }
         }
 
@@ -157,7 +165,8 @@ fun AddTaskInputContent(
                     color = state.color,
                 )
                 scope.launch { onSave(task) }
-            }
+            },
+            modifier = Modifier.testTag("button_save_task")
         ) {
             Text("追加")
         }
@@ -188,23 +197,28 @@ fun DatePickerModal(
 ) {
     val datePickerState = rememberDatePickerState()
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                onDateSelected(datePickerState.selectedDateMillis)
-                onDismiss()
-            }) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
+    Box(
+        modifier = Modifier.testTag("show_datepicker")
     ) {
-        DatePicker(state = datePickerState)
+        DatePickerDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = {
+                    onDateSelected(datePickerState.selectedDateMillis)
+                    onDismiss()
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text("Cancel")
+                }
+            },
+            modifier = Modifier.testTag("show_datepicker")
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }
 
@@ -230,14 +244,16 @@ fun ImportanceRadioButtons(
                         onClick = { onSelected(priority) },
                         role = Role.RadioButton,
                     )
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .testTag("priority_${priority.level}"),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 RadioButton(
                     selected = (
                             priority == selected
                             ),
-                    onClick = null
+                    onClick = null,
+                    modifier = Modifier.testTag("priority_${priority.level}"),
                 )
                 Text(
                     text = priority.label,

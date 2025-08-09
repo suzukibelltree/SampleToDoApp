@@ -106,7 +106,7 @@ fun TaskFilter(
     ) {
         FilterChip(
             selected = selectedFilter == null,
-            onClick = { onFilterSelected(null) }, // 全てのタスクを表示
+            onClick = { onFilterSelected(null) },
             label = { Text("All") },
         )
         FilterChip(
@@ -189,6 +189,7 @@ fun TaskListContent(
  * @param onClick タスククリック時のコールバック
  * @param onDelete タスク削除時のコールバック
  * @param onComplete タスク完了時のコールバック
+ * @param color タスクの色（デフォルトはタスクの色）
  */
 @Composable
 fun TaskCard(
@@ -196,7 +197,7 @@ fun TaskCard(
     onClick: () -> Unit,
     onDelete: () -> Unit,
     onComplete: () -> Unit,
-    color: Long = task.color // デフォルトはタスクの色
+    color: Long = task.color
 ) {
     Card(
         modifier = Modifier
