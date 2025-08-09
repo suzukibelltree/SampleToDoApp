@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,6 +59,7 @@ fun TodoAppNavigation(
             if (showFab) {
                 FloatingActionButton(
                     onClick = { navController.navigate(Route.AddTask) },
+                    modifier = Modifier.testTag("fab_add_task")
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Task")
                 }
